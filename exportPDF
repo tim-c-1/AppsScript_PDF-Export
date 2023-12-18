@@ -1,0 +1,45 @@
+// creates a PDF file and saves it to user-specified Drive location
+
+//creates custom menu to select script from sheet
+function onOpen(){
+let ui = SpreadsheetApp.getUi();
+ui.createMenu('Scripts')
+  .addItem('Export as PDF','exportPDF')
+  .addToUi();
+}
+
+
+//Function pulls blob data from given url. Function gets called in main function to keep legibility high.
+function getFileasBlob(exportUrl) {
+  let response = UrlFetchApp.fetch(exportUrl, {mutehttpexceptions: true, headers: {Authorization:'Bearer ' + ScriptApp.getOAuthToken(),}
+  });
+  return response.getBlob();
+}
+
+//call this function to export active sheet in pre-set workbook
+//need to manually set destination folder ID depending on where the PDFs will be saved.
+function exportPDF(){
+const FOLDER_ID = "Enter your desintation folder ID"
+  //set folder pathway using folder ID and get active sheet ID
+  const folder = DriveApp.getFolderById(FOLDER_ID)
+  let ssID = SpreadsheetApp.getActiveSheet().getSheetId()
+  var ui = SpreadsheetApp.getUi();
+  let fDate = Utilities.formatDate(new Date(),"EST","MM.dd.yy")
+
+  //get the ID of current spreadsheet- you can hard code this if you only want to export a specific sheet each time from anywhere in your workbook.
+  //you can do this by using ".getsheetbyName" to reference sheet being exported.
+  let myWB = SpreadsheetApp.getActiveSpreadsheet().getId();
+
+  //Ties new file name to cell value. I.E. a client's name in a template. Pulls value from cell A1 on the active sheet.
+  let fName = SpreadsheetApp.getActiveSpreadsheet().getRange("A1").getValue();
+
+ //this exports the file as a pdf using above values.
+  let blob = getFileasBlob("https://docs.google.com/spreadsheets/d/" + myWB 
+   +'/export'
+   + '?format=pdf&'
+   + 'gridlines=false&'
+   + 'gid=' + ssID).setName(fName + " " + fDate);
+  let file = folder.createFile(blob)
+  Logger.log(file.getUrl());
+ui.alert("Your file has exported successfully!");
+}
