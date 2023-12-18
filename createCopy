@@ -1,0 +1,30 @@
+//creates copy of desired template, saves in specified folder
+//uses user input for new client name.
+//change output folders/name as needed. Call this function from custom menu as "CopySheet".
+
+function CopySheet(){
+  const FOLDER_ID = "set destination folder";
+  let folder = DriveApp.getFolderById(FOLDER_ID);
+  var ui = SpreadsheetApp.getUi();
+  let myWB = SpreadsheetApp.getActiveSpreadsheet().getId();
+    
+  //ask for new client name
+  var response = ui.prompt("Client Name?",ui.ButtonSet.OK_CANCEL);
+  // Process the user's response.
+  if (response.getSelectedButton() == ui.Button.OK) {
+   var custName = response.getResponseText();
+
+  //change " worksheet" to whatever string you want the file name to be. Don't forget to leave a space in the string.      
+  let fName = custName + " Worksheet";
+  
+  //removes first button/drawing object from new sheet
+  let newSheetID = DriveApp.getFileById(myWB).makeCopy(fName, folder).getId();
+  let newSheet = SpreadsheetApp.openById(newSheetID);
+  let drawing = newSheet.getSheetByName("Dashboard").getDrawings();
+  drawing[0].remove();
+        
+  //gives user confirmation of script completion
+  ui.alert("Your new workbook has been created!");
+  
+  }
+}
