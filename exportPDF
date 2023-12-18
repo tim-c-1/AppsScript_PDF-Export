@@ -1,10 +1,12 @@
 // creates a PDF file and saves it to user-specified Drive location
 
-//creates custom menu to select script from sheet
+//creates custom menu to select script from sheet. Ties in exportPDF and CopySheet scripts.
 function onOpen(){
 let ui = SpreadsheetApp.getUi();
 ui.createMenu('Scripts')
   .addItem('Export as PDF','exportPDF')
+  .addSeparator()
+  .addItem('Set up new client', 'CopySheet')
   .addToUi();
 }
 
